@@ -1,18 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
+import SpotifyTrack from './SpotifyTrack';
 
-interface PlaylistType {
+interface RawTrackType {
+  track: TrackType;
+}
+interface TrackType {
   id: string;
   name: string;
+  album: AlbumType;
+}
+interface AlbumType {
+  id: string;
+  name: string;
+  images: ImageType[];
+}
+interface ImageType {
+  height: number;
+  width: number;
+  url: string;
 }
 
 function SpotifyList() {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [items, setItems] = useState<Array<PlaylistType>>([]);
+  const [items, setItems] = useState<Array<RawTrackType>>([]);
 
   useEffect(() => {
-    fetch("https://api.spotify.com/v1/me/playlists", {
+    fetch("https://api.spotify.com/v1/me/tracks?limit=50", {
       headers: {
         'Authorization': 'Bearer ' + process.env.REACT_APP_TOKEN,
         'Content-Type': ' application/json'
@@ -41,14 +56,15 @@ function SpotifyList() {
     );
   } else {
     return (
+      <div>
+        <p>{items.length} favs loaded</p>
         <ul>
           {items.map(item => (
-            <li key={item.id}>
-              {item.name}
-            </li>
+            <SpotifyTrack track={item.track} />
           ))}
         </ul>
-      );
+      </div>
+    );
   }
 }
 
