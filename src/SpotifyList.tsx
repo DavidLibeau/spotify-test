@@ -1,25 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import SpotifyTrack from './SpotifyTrack';
-
-interface RawTrackType {
-  track: TrackType;
-}
-interface TrackType {
-  id: string;
-  name: string;
-  album: AlbumType;
-}
-interface AlbumType {
-  id: string;
-  name: string;
-  images: ImageType[];
-}
-interface ImageType {
-  height: number;
-  width: number;
-  url: string;
-}
+import type { RawTrackType } from './CommonType';
 
 function SpotifyList() {
   const [error, setError] = useState(null);
@@ -33,11 +15,17 @@ function SpotifyList() {
         'Content-Type': ' application/json'
       }
     })
-      .then(res => res.json())
+      .then(res => {
+        return res.json();
+      })
       .then(
         (result) => {
           setIsLoaded(true);
-          setItems(result.items);
+          if (result.error) {
+            setError(result.error.message);
+          } else {
+            setItems(result.items);
+          }
         },
         (error) => {
           setIsLoaded(true);
