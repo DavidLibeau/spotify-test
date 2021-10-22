@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import './App.css';
 import SpotifyTrack from './SpotifyTrack';
 import type { RawTrackType } from './CommonType';
 

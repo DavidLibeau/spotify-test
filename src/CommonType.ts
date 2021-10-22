@@ -1,20 +1,20 @@
-interface RawTrackType {
+type RawTrackType = {
     track: TrackType;
-  };
-  type TrackType = {
+};
+type TrackType = {
     id: string;
     name: string;
     album: AlbumType;
-  };
-  type AlbumType = {
+};
+type AlbumType = {
     id: string;
     name: string;
     images: ImageType[];
-  };
-  type ImageType = {
+};
+type ImageType = {
     height: number;
     width: number;
     url: string;
-  };
-  
-  export type { RawTrackType, TrackType, AlbumType, ImageType }
+};
+
+export type { RawTrackType, TrackType, AlbumType, ImageType }
