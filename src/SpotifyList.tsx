@@ -5,10 +5,20 @@ import type { RawTrackType } from './CommonType';
 function SpotifyList() {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [nextPage, setNextPage] = useState(0);
   const [items, setItems] = useState<Array<RawTrackType>>([]);
 
-  useEffect(() => {
-    fetch("https://api.spotify.com/v1/me/tracks?limit=50", {
+  const loadMoreHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    loadSpotifyFavs(true)
+  };
+
+  const loadSpotifyFavs = (addToExisting:boolean) => {
+    var previousItems: any[] = [];
+    if(addToExisting){
+      previousItems = items;
+    }
+    fetch("https://api.spotify.com/v1/me/tracks?limit=50&offset=" + nextPage, {
       headers: {
         'Authorization': 'Bearer ' + process.env.REACT_APP_TOKEN,
         'Content-Type': ' application/json'
@@ -23,7 +33,12 @@ function SpotifyList() {
           if (result.error) {
             setError(result.error.message);
           } else {
-            setItems(result.items);
+            if (result.offset + result.limit < result.total) {
+              setNextPage(result.offset + result.limit);
+            } else {
+              setNextPage(0);
+            }
+            setItems(previousItems.concat(result.items));
           }
         },
         (error) => {
@@ -31,6 +46,10 @@ function SpotifyList() {
           setError(error);
         }
       )
+  };
+
+  useEffect(() => {
+    loadSpotifyFavs(false);
   }, [])
 
   if (error) {
@@ -45,11 +64,14 @@ function SpotifyList() {
     return (
       <div>
         <p>{items.length} favs loaded</p>
-        <ul>
+        <ul className="SpotifyList">
           {items.map(item => (
             <SpotifyTrack track={item.track} />
           ))}
         </ul>
+        <div>
+          {nextPage > 0 ? <button onClick={loadMoreHandler}>Load more</button> : <span>All favs loaded</span>}
+        </div>
       </div>
     );
   }
